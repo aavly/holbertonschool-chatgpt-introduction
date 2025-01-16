@@ -4,5 +4,5 @@ import sys
 if len(sys.argv) == 1:
     print("Usage: ./script.py <arguments>")
 else:
-    for i in range(len(sys.argv)):
-        print(f"Argument {i}: {sys.argv[i]}")
+    for arg in sys.argv[1:]:  # Start from the second element (skip script name)
+        print(arg)
