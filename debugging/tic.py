@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 
 def print_board(board):
-    """Prints the current state of the Tic Tac Toe board."""
-    for i, row in enumerate(board):
+    """Prints the current Tic-Tac-Toe board."""
+    for row in board:
         print(" | ".join(row))
-        if i < 2:  # Avoid printing separator after the last row
-            print("-" * 5)
+        print("-" * 5)
 
 def check_winner(board):
-    """Checks if there is a winner in the current board state."""
+    """Checks if there is a winner on the Tic-Tac-Toe board."""
     # Check rows
     for row in board:
         if row.count(row[0]) == len(row) and row[0] != " ":
@@ -22,71 +21,61 @@ def check_winner(board):
     # Check diagonals
     if board[0][0] == board[1][1] == board[2][2] and board[0][0] != " ":
         return True
+
     if board[0][2] == board[1][1] == board[2][0] and board[0][2] != " ":
         return True
 
     return False
 
-def check_tie(board):
-    """Checks if the board is full and no winner is found (tie)."""
+def check_draw(board):
+    """Checks if the game is a draw (all spots filled)."""
     for row in board:
-        if " " in row:  # If there's an empty spot, it's not a tie
-            return False
-    return True
+        if " " in row:
+            return False  # There's still an empty spot
+    return True  # No empty spots, it's a draw
 
 def tic_tac_toe():
-    """Runs the main game loop for Tic Tac Toe."""
+    """Main game loop for Tic-Tac-Toe."""
     board = [[" "]*3 for _ in range(3)]
     player = "X"
-
+    
     while True:
         print_board(board)
         
-        # Get valid row input
+        # Get user input for row and column with input validation
         while True:
             try:
                 row = int(input(f"Enter row (0, 1, or 2) for player {player}: "))
-                if row not in [0, 1, 2]:
-                    print("Invalid input! Please enter a row number between 0 and 2.")
-                    continue
-            except ValueError:
-                print("Invalid input! Please enter a numeric value for the row.")
-                continue
-
-            # Get valid column input
-            while True:
-                try:
-                    col = int(input(f"Enter column (0, 1, or 2) for player {player}: "))
-                    if col not in [0, 1, 2]:
-                        print("Invalid input! Please enter a column number between 0 and 2.")
-                        continue
-                except ValueError:
-                    print("Invalid input! Please enter a numeric value for the column.")
-                    continue
-
-                # Check if the spot is empty
-                if board[row][col] == " ":
-                    board[row][col] = player
-                    break
+                col = int(input(f"Enter column (0, 1, or 2) for player {player}: "))
+                
+                # Check if the input is within the valid range
+                if 0 <= row < 3 and 0 <= col < 3:
+                    if board[row][col] == " ":
+                        break
+                    else:
+                        print("That spot is already taken! Try again.")
                 else:
-                    print("That spot is already taken! Try again.")
-                    continue
+                    print("Invalid input. Please enter a row and column between 0 and 2.")
+            except ValueError:
+                print("Invalid input. Please enter a valid number for row and column.")
 
-            break
+        # Update the board with the player's move
+        board[row][col] = player
         
-        # Check for a winner or tie after each move
+        # Check if the current player won
         if check_winner(board):
             print_board(board)
             print(f"Player {player} wins!")
             break
-        elif check_tie(board):
+        
+        # Check if the game is a draw
+        if check_draw(board):
             print_board(board)
-            print("It's a tie!")
+            print("It's a draw!")
             break
-
+        
         # Switch player
         player = "O" if player == "X" else "X"
 
-# Run the game
 if __name__ == "__main__":
     tic_tac_toe()

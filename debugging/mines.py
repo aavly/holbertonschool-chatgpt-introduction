@@ -40,31 +40,27 @@ class Minesweeper:
         return count
 
     def reveal(self, x, y):
+        # Check if the clicked position is a mine
         if (y * self.width + x) in self.mines:
             return False
-        self.revealed[y][x] = True
-        if self.count_mines_nearby(x, y) == 0:
-            for dx in [-1, 0, 1]:
-                for dy in [-1, 0, 1]:
-                    nx, ny = x + dx, y + dy
-                    if 0 <= nx < self.width and 0 <= ny < self.height and not self.revealed[ny][nx]:
-                        self.reveal(nx, ny)
-        self.check_win()
-        return True
 
-    def check_win(self):
-        # Count how many non-mine cells have been revealed
-        revealed_non_mines = 0
-        for y in range(self.height):
-            for x in range(self.width):
-                if not (y * self.width + x) in self.mines and self.revealed[y][x]:
-                    revealed_non_mines += 1
-        
-        # If all non-mine cells have been revealed, the player wins
-        if revealed_non_mines == self.width * self.height - len(self.mines):
-            self.print_board(reveal=True)
-            print("Congratulations! You've won the game.")
-            exit(0)  # Exit the game after winning
+        # Reveal the current cell
+        self.revealed[y][x] = True
+
+        # If there are no neighboring mines, reveal surrounding cells iteratively (non-recursive)
+        if self.count_mines_nearby(x, y) == 0:
+            to_reveal = [(x, y)]
+            while to_reveal:
+                cx, cy = to_reveal.pop()
+                for dx in [-1, 0, 1]:
+                    for dy in [-1, 0, 1]:
+                        nx, ny = cx + dx, cy + dy
+                        if 0 <= nx < self.width and 0 <= ny < self.height and not self.revealed[ny][nx]:
+                            self.revealed[ny][nx] = True
+                            if self.count_mines_nearby(nx, ny) == 0:
+                                to_reveal.append((nx, ny))
+
+        return True
 
     def play(self):
         while True:
@@ -72,6 +68,9 @@ class Minesweeper:
             try:
                 x = int(input("Enter x coordinate: "))
                 y = int(input("Enter y coordinate: "))
+                if x < 0 or x >= self.width or y < 0 or y >= self.height:
+                    print("Invalid coordinates. Please try again.")
+                    continue
                 if not self.reveal(x, y):
                     self.print_board(reveal=True)
                     print("Game Over! You hit a mine.")
